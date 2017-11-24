@@ -1,0 +1,97 @@
+create or replace package ut_plu_stack_tt as
+
+    Description constant pete_types.typ_description := 'plutil.stack template type';
+
+    procedure pushPushesPopPops(D varchar2 := 'push pushes, pop pops - stack works');
+    procedure peekPeeks(d varchar2 := 'peek peeks');
+    procedure popAsProcedure(D varchar2 := 'pop has procedure overload');
+    procedure popFromEmptyThrows(D varchar2 := 'pop from empty throws');
+    procedure peekOnEmptyThrows(D varchar2 := 'peek on empty throws');
+
+end;
+/
+create or replace package body ut_plu_stack_tt as
+
+    ----------------------------------------------------------------------------
+    procedure pushPushesPopPops(D varchar2) is
+        l_stack plu_stack_tt := plu_stack_tt();
+    begin
+        pete.set_method_description(D);
+        -- prepare
+        pete_assert.eq(1, l_stack.is_empty);
+        l_stack.push(plu_stack_type_tt(1));
+        pete_assert.eq(1, l_stack.pop().value);
+        pete_assert.eq(1, l_stack.is_empty);
+        --
+        l_stack.push(plu_stack_type_tt(2));
+        pete_assert.eq(2, l_stack.pop().value);
+        l_stack.push(plu_stack_type_tt(3));
+        pete_assert.eq(3, l_stack.pop().value);
+        pete_assert.eq(1, l_stack.is_empty);
+        --
+    end;
+
+    ----------------------------------------------------------------------------
+    procedure peekPeeks(d varchar2) is
+        l_stack plu_stack_tt := plu_stack_tt();
+    begin
+        pete.set_method_description(d);
+        --
+        -- prepare
+        pete_assert.eq(1, l_stack.is_empty);
+        l_stack.push(plu_stack_type_tt(2));
+        l_stack.push(plu_stack_type_tt(1));
+        pete_assert.eq(1, l_stack.peek().value);
+        pete_assert.eq(0, l_stack.is_empty);
+        pete_assert.eq(1, l_stack.peek().value);
+        --
+    end;
+
+    ----------------------------------------------------------------------------
+    procedure popAsProcedure(D varchar2) is
+        l_stack plu_stack_tt := plu_stack_tt();
+    begin
+        pete.set_method_description(D);
+        -- prepare
+        l_stack.push(plu_stack_type_tt(1));
+        l_stack.pop;
+        pete_assert.eq(1, l_stack.is_empty);
+    end;
+
+    ----------------------------------------------------------------------------
+    procedure popFromEmptyThrows(D varchar2) is
+        l_stack  plu_stack_tt := plu_stack_tt();
+        l_thrown boolean := false;
+    begin
+        pete.set_method_description(D);
+        -- prepare
+        begin
+            l_stack.pop;
+        exception
+            when others then
+                l_thrown := true;
+        end;
+        --
+        pete_assert.this(l_thrown, 'method should have thrown.');
+    end;
+
+    ----------------------------------------------------------------------------
+    procedure peekOnEmptyThrows(D varchar2) is
+        l_stack  plu_stack_tt := plu_stack_tt();
+        l_dummy  plu_stack_type_tt;
+        l_thrown boolean := false;
+    begin
+        pete.set_method_description(D);
+        -- prepare
+        begin
+            l_dummy := l_stack.peek();
+        exception
+            when others then
+                l_thrown := true;
+        end;
+        --
+        pete_assert.this(l_thrown, 'method should have thrown.');
+    end;
+
+end;
+/

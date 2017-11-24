@@ -1,0 +1,18 @@
+create or replace package ut_plu_stack_impl as
+
+    Description constant pete_types.typ_description := 'plutil.stack - package implementation';
+
+    procedure dummy(D varchar2 := 'dummy test');
+
+end;
+/
+create or replace package body ut_plu_stack_impl as
+
+    ----------------------------------------------------------------------------
+    procedure dummy(D varchar2) is
+    begin
+        pete.set_method_description(D);
+    end;
+
+end;
+/
